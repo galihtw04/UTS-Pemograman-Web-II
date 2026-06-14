@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    container_name: uts-web2-app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: uts-web2-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: uts_web2
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: "T$$rus1t"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: uts-web2-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_AUTH_TYPE: cookie
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  db_data:
